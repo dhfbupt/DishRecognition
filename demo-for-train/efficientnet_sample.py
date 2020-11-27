@@ -154,42 +154,43 @@ def exp_lr_scheduler(optimizer, epoch, init_lr=0.01, lr_decay_epoch=10):
     return optimizer
 
 
-# train
-pth_map = {
-    'efficientnet-b0': 'efficientnet-b0-355c32eb.pth',
-    'efficientnet-b1': 'efficientnet-b1-f1951068.pth',
-    'efficientnet-b2': 'efficientnet-b2-8bb594d6.pth',
-    'efficientnet-b3': 'efficientnet-b3-5fb5a3c3.pth',
-    'efficientnet-b4': 'efficientnet-b4-6ed6700e.pth',
-    'efficientnet-b5': 'efficientnet-b5-b6417697.pth',
-    'efficientnet-b6': 'efficientnet-b6-c76e70fd.pth',
-    'efficientnet-b7': 'efficientnet-b7-dcc49843.pth',
-}
-# 自动下载到本地预训练
-# model_ft = EfficientNet.from_pretrained('efficientnet-b0')
-# 离线加载预训练，需要事先下载好
-model_ft = EfficientNet.from_name(net_name)
-net_weight = 'eff_weights/' + pth_map[net_name]
-state_dict = torch.load(net_weight)
-model_ft.load_state_dict(state_dict)
+if __name__ == '__main__':
+    # train
+    pth_map = {
+        'efficientnet-b0': 'efficientnet-b0-355c32eb.pth',
+        'efficientnet-b1': 'efficientnet-b1-f1951068.pth',
+        'efficientnet-b2': 'efficientnet-b2-8bb594d6.pth',
+        'efficientnet-b3': 'efficientnet-b3-5fb5a3c3.pth',
+        'efficientnet-b4': 'efficientnet-b4-6ed6700e.pth',
+        'efficientnet-b5': 'efficientnet-b5-b6417697.pth',
+        'efficientnet-b6': 'efficientnet-b6-c76e70fd.pth',
+        'efficientnet-b7': 'efficientnet-b7-dcc49843.pth',
+    }
+    # 自动下载到本地预训练
+    # model_ft = EfficientNet.from_pretrained('efficientnet-b0')
+    # 离线加载预训练，需要事先下载好
+    model_ft = EfficientNet.from_name(net_name)
+    net_weight = 'eff_weights/' + pth_map[net_name]
+    state_dict = torch.load(net_weight)
+    model_ft.load_state_dict(state_dict)
 
-# 修改全连接层
-num_ftrs = model_ft._fc.in_features
-model_ft._fc = nn.Linear(num_ftrs, class_num)
+    # 修改全连接层
+    num_ftrs = model_ft._fc.in_features
+    model_ft._fc = nn.Linear(num_ftrs, class_num)
 
-criterion = nn.CrossEntropyLoss()
-if use_gpu:
-    model_ft = model_ft.cuda()
-    criterion = criterion.cuda()
+    criterion = nn.CrossEntropyLoss()
+    if use_gpu:
+        model_ft = model_ft.cuda()
+        criterion = criterion.cuda()
 
-optimizer = optim.SGD((model_ft.parameters()), lr=lr,
-                      momentum=momentum, weight_decay=0.0004)
+    optimizer = optim.SGD((model_ft.parameters()), lr=lr,
+                          momentum=momentum, weight_decay=0.0004)
 
-train_loss, best_model_wts = train_model(model_ft, criterion, optimizer, exp_lr_scheduler, num_epochs=num_epochs)
+    train_loss, best_model_wts = train_model(model_ft, criterion, optimizer, exp_lr_scheduler, num_epochs=num_epochs)
 
-# test
-print('-' * 10)
-print('Test Accuracy:')
-model_ft.load_state_dict(best_model_wts)
-criterion = nn.CrossEntropyLoss().cuda()
-test_model(model_ft, criterion)
+    # test
+    print('-' * 10)
+    print('Test Accuracy:')
+    model_ft.load_state_dict(best_model_wts)
+    criterion = nn.CrossEntropyLoss().cuda()
+    test_model(model_ft, criterion)
