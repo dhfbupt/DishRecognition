@@ -12,13 +12,13 @@ from efficientnet.model import EfficientNet
 # some parameters
 use_gpu = torch.cuda.is_available()
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-data_dir = 'Flowers'
+data_dir = 'Dishes'
 batch_size = 64
 lr = 0.01
 momentum = 0.9
 num_epochs = 60
 input_size = 224
-class_num = 17
+class_num = 72
 net_name = 'efficientnet-b0'
 
 
